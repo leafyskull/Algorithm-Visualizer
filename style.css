@@ -1,0 +1,35 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 20px;
+  background-color: #f4f4f4;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.controls {
+  margin-bottom: 20px;
+}
+
+#arrayContainer {
+  width: 90%;
+  height: 400px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  background: white;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.bar {
+  background-color: steelblue;
+  width: 20px;
+}
