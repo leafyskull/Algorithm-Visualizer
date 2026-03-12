@@ -9,6 +9,7 @@
 const arrayContainer = document.getElementById("arrayContainer");
 const generateBtn = document.getElementById("generateBtn");
 const startBtn = document.getElementById("startBtn");
+const stopBtn = document.getElementById("stopBtn");
 const sizeSlider = document.getElementById("sizeSlider");
 const speedSlider = document.getElementById("speedSlider");
 const algorithmSelect = document.getElementById("algorithmSelect");
@@ -65,6 +66,7 @@ startBtn.addEventListener("click", async () => {
     if (isSorting) return;
 
     isSorting = true;
+    stopAnimation = false;
 
     const algorithm = algorithmSelect.value;
     let animations = [];
@@ -82,10 +84,24 @@ startBtn.addEventListener("click", async () => {
     }
 
     await playAnimations(animations);
-    array.sort((a, b) => a - b);
 
-    colorSortedBars();
+    if (stopAnimation){
+        isSorting = false;
+        stopAnimation = false;
+        return;
+    }
+
+    await colorSortedBars();
+
+    if (stopAnimation){
+        stopAnimation = false;
+    }
+
     isSorting = false;
+});
+
+stopBtn.addEventListener("click", async () =>{
+    stopAnimation = true;
 });
 
 
@@ -184,42 +200,56 @@ function getInsertionSortAnimations(arr){
 
 async function playAnimations(animations){
     const bars = document.getElementsByClassName("bar");
-    const speed = 101 - Number(speedSlider.value);
-    const sortedIndicies = new Set();
+    let speed = 101 - Number(speedSlider.value);
+    const sortedIndices = new Set();
 
     for (let bar of bars){
-        bar.style.backgroundColor = "steelBlue";
+        bar.style.backgroundColor = "steelblue";
     }
 
     for (let step of animations){
+
+        if (stopAnimation){
+            return;
+        }
+
+        speed = 101 - Number(speedSlider.value);
+
         if (step.type === "compare"){
             bars[step.i].style.backgroundColor = "red";
             bars[step.j].style.backgroundColor = "red";
 
             await sleep(speed * 2);
 
-            if (!sortedIndicies.has(step.i)){
-                bars[step.i].style.backgroundColor = "steelBlue";
+            if (!sortedIndices.has(step.i)){
+                bars[step.i].style.backgroundColor = "steelblue";
             } else {
                 bars[step.i].style.backgroundColor = "green";
             }
 
-            if (!sortedIndicies.has(step.j)){
-                bars[step.j].style.backgroundColor = "steelBlue";
+            if (!sortedIndices.has(step.j)){
+                bars[step.j].style.backgroundColor = "steelblue";
             } else {
                 bars[step.j].style.backgroundColor = "green";
             }
         }
 
         if (step.type === "swap"){
+            // Swap visual heights
             const tempHeight = bars[step.i].style.height;
             bars[step.i].style.height = bars[step.j].style.height;
             bars[step.j].style.height = tempHeight;
+
+            // Swap actual values in array
+            const temp = array[step.i];
+            array[step.i] = array[step.j];
+            array[step.j] = temp;
 
             await sleep(speed * 2);
         }
 
         if (step.type === "sorted"){
+            sortedIndices.add(step.index);
             bars[step.index].style.backgroundColor = "green";
         }
     }
@@ -229,6 +259,8 @@ async function colorSortedBars(){
     const bars = document.getElementsByClassName("bar");
 
     for (let i = 0; i < bars.length; i++){
+        if (stopAnimation) return;
+
         bars[i].style.backgroundColor = "green";
         await sleep(10);
     }
@@ -251,4 +283,5 @@ function sleep(ms){
 // ******************************
 
 let isSorting = false;
+let stopAnimation = false;
 generateArray(30);
