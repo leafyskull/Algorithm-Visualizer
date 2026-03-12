@@ -1,3 +1,11 @@
+// Script.js: This holds the logic for sorting and animations.
+
+
+
+// ******************************
+// References / setup
+// ******************************
+
 const arrayContainer = document.getElementById("arrayContainer");
 const generateBtn = document.getElementById("generateBtn");
 const startBtn = document.getElementById("startBtn");
@@ -6,6 +14,11 @@ const speedSlider = document.getElementById("speedSlider");
 const algorithmSelect = document.getElementById("algorithmSelect");
 
 let array = [];
+
+
+// ******************************
+// Array handlers
+// ******************************
 
 function generateArray(size){
     array = [];
@@ -32,6 +45,12 @@ function renderArray(){
     }
 }
 
+
+
+// ******************************
+// Button Event Listeners
+// ******************************
+
 generateBtn.addEventListener("click", () =>{
     if (isSorting) return;
     generateArray(Number(sizeSlider.value));
@@ -42,10 +61,38 @@ sizeSlider.addEventListener("input", () => {
     generateArray(Number(sizeSlider.value));
 });
 
-generateArray(30);
+startBtn.addEventListener("click", async () => {
+    if (isSorting) return;
+
+    isSorting = true;
+
+    const algorithm = algorithmSelect.value;
+    let animations = [];
+
+    if (algorithm === "bubble"){
+        animations = getBubbleSortAnimations(array);
+    }
+
+    if (algorithm === "selection"){
+        animations = getSelectionSortAnimations(array);
+    }
+
+    if (algorithm === "insertion"){
+        animations = getInsertionSortAnimations(array);
+    }
+
+    await playAnimations(animations);
+    array.sort((a, b) => a - b);
+
+    colorSortedBars();
+    isSorting = false;
+});
 
 
 
+// ******************************
+// Sorting algorithms
+// ******************************
 
 function getBubbleSortAnimations(arr){
     const animations = [];
@@ -63,8 +110,11 @@ function getBubbleSortAnimations(arr){
                 copy[j+1] = temp;
             }
         }
+
+        animations.push({ type: "sorted", index: copy.length - i - 1});
     }
 
+    animations.push({ type: "sorted", index: 0});
     return animations;
 }
 
@@ -89,18 +139,57 @@ function getSelectionSortAnimations(arr){
             copy[i] = copy[min_index];
             copy[min_index] = temp;
         }
+
+        animations.push({ type: "sorted", index: i});
+    }
+
+    animations.push({ type: "sorted", index: copy.length - 1});
+    return animations;
+}
+
+function getInsertionSortAnimations(arr){
+    const animations = [];
+    const copy = [...arr];
+
+    for (let i = 1; i < copy.length; i++){
+        let j = i;
+
+        while (j > 0){
+            animations.push({ type: "compare", i: j - 1, j: j});
+
+            if (copy[j-1] > copy[j]){
+                animations.push({ type: "swap", i: j - 1, j: j});
+
+                let temp = copy[j];
+                copy[j] = copy[j-1];
+                copy[j-1] = temp;
+
+                j--;
+            } else {
+                break;
+            }
+        }
+
+        animations.push({ type: "sorted", index: i});
     }
 
     return animations;
 }
 
-function sleep(ms){
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+
+
+// ******************************
+// Animation stuff
+// ******************************
 
 async function playAnimations(animations){
     const bars = document.getElementsByClassName("bar");
     const speed = 101 - Number(speedSlider.value);
+    const sortedIndicies = new Set();
+
+    for (let bar of bars){
+        bar.style.backgroundColor = "steelBlue";
+    }
 
     for (let step of animations){
         if (step.type === "compare"){
@@ -109,8 +198,17 @@ async function playAnimations(animations){
 
             await sleep(speed * 2);
 
-            bars[step.i].style.backgroundColor = "steelBlue";
-            bars[step.j].style.backgroundColor = "steelBlue";
+            if (!sortedIndicies.has(step.i)){
+                bars[step.i].style.backgroundColor = "steelBlue";
+            } else {
+                bars[step.i].style.backgroundColor = "green";
+            }
+
+            if (!sortedIndicies.has(step.j)){
+                bars[step.j].style.backgroundColor = "steelBlue";
+            } else {
+                bars[step.j].style.backgroundColor = "green";
+            }
         }
 
         if (step.type === "swap"){
@@ -119,6 +217,10 @@ async function playAnimations(animations){
             bars[step.j].style.height = tempHeight;
 
             await sleep(speed * 2);
+        }
+
+        if (step.type === "sorted"){
+            bars[step.index].style.backgroundColor = "green";
         }
     }
 }
@@ -132,28 +234,21 @@ async function colorSortedBars(){
     }
 }
 
-startBtn.addEventListener("click", async () => {
-    if (isSorting) return;
 
-    isSorting = true;
 
-    const algorithm = algorithmSelect.value;
-    let animations = [];
+// ******************************
+// Misc
+// ******************************
 
-    if (algorithm === "bubble"){
-        animations = getBubbleSortAnimations(array);
-    }
+function sleep(ms){
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-    if (algorithm === "selection"){
-        animations = getSelectionSortAnimations(array);
-    }
 
-    await playAnimations(animations);
-    array.sort((a, b) => a - b);
 
-    colorSortedBars();
-    isSorting = false;
-});
+// ******************************
+// Initialization stuff
+// ******************************
 
 let isSorting = false;
-
+generateArray(30);
