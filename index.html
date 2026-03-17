@@ -1,37 +1,46 @@
 <!DOCTYPE html>
-<html lang = "en">
+<html lang="en">
+
 <head>
-    <meta charset = "UTF-8"/>
-    <meta name = "viewport" content = "width-device-width", initial-scale = 1.0 />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width-device-width" , initial-scale=1.0 />
     <title> Sorting Visualizer </title>
-    <link rel = "stylesheet" href = "style.css" />
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
     <h1> Sorting Visualizer </h1>
 
-    <div class = "controls">
-        <button id = "generateBtn"> Generate new array </button>
+    <div class="controls">
+        <div class="control-row">
+            <label for="sizeSlider">Size:</label>
+            <input type="range" id="sizeSlider" min="10" max="100" value="30" />
+        </div>
 
-        <label for = "sizeSlider">Size:</label>
-        <input type = "range" id = "sizeSlider" min = "10" max = "100" value = "30"/>
+        <div class="control-row">
+            <label for="speedSlider">Speed:</label>
+            <input type="range" id="speedSlider" min="1" max="100" value="50" />
+        </div>
 
-        <label for = "speedSlider">Speed:</label>
-        <input type = "range" id = "speedSlider" min = "1" max = "100" value = "50"/>
+        <div class="control-row">
+            <label for="algorithmSelect">Algorithm:</label>
+            <select id="algorithmSelect">
+                <option value="bubble">Bubble Sort</option>
+                <option value="selection">Selection Sort</option>
+                <option value="insertion">Insertion Sort</option>
+            </select>
+        </div>
 
-        <label for = "algorithmSelect">Algorithm:</label>
-        <select id = "algorithmSelect">
-            <option value = "bubble">Bubble Sort</option>
-            <option value = "selection">Selection Sort</option>
-            <option value = "insertion">Insertion Sort</option>
-        </select>
-
-        <button id = "startBtn">Start Sorting</button>
-        <button id = "stopBtn">Stop Sorting</button>
+        <div>
+            <button id="generateBtn">Generate new array</button>
+            <button id="startBtn">Start Sorting</button>
+            <button id="stopBtn">Stop Sorting</button>
+        </div>
     </div>
 
-    <div id = "arrayContainer"></div>
+    <div id="arrayContainer"></div>
 
-    <script src = "script.js"></script>
+    <script src="script.js"></script>
 </body>
+
 </html>
